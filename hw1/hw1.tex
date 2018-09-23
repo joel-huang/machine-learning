@@ -1,0 +1,85 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[margin=0.8in,bottom=1.25in,columnsep=.4in]{geometry}
+%\usepackage{indentfirst}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+
+\title{
+	01.112 Machine Learning\\
+	Homework 1
+}
+
+\author{Joel Huang, 1002530}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Linear Algebra and Probability Review}
+	\subsection*{a. Point-Hyperplane distance}
+		\subsubsection*{Proof of $\vec{\theta}$'s orthogonality}
+			Consider a hyperplane P in $\mathbb{R}^{d}$, with equation $\vec{\theta}\cdot x + \theta_{0}=0$.
+			We pick two points, $\vec{x_1}$ and $\vec{x_2}$, that lie on P and thus satisfy (1) and (2)
+			respectively:
+			\begin{equation}
+			\vec{\theta}\cdot\vec{x_1}+\theta_0 = 0
+			\end{equation}
+			\begin{equation}
+			\vec{\theta}\cdot\vec{x_2}+\theta_0 = 0
+			\end{equation}
+			Subtracting (1) from (2), we have zero as the dot product of $\vec{\theta}$ and a vector on P.
+			\begin{equation}
+			\vec{\theta}\cdot\ (\vec{x_2}-\vec{x_1}) = 0
+			\end{equation}
+			Since $\vec{\theta}$ is orthogonal to $(\vec{x_2}-\vec{x_1})$, it is orthogonal to all vectors on P,
+			as well as P itself.
+		\subsubsection*{Distance from $\vec{y}$ to the hyperplane}
+			Consider any point $\vec{x}$ on the plane. The projection $\vec{a}$ of the point vector $\vec{x}$ on orthogonal vector $\vec{\theta}$
+			allows us to take its length, or $\ell^2$-norm, as the distance from the hyperplane to the origin.
+			\begin{equation}
+				\vec{a} = \vec{x}\cdot \frac{\vec{\theta}}{|\vec{\theta}|}
+			\end{equation}
+			Let $\vec{y}$ be the point of interest, $\vec{y}\in\mathbb{R}^n$. We want to find its distance to the hyperplane P. The projection $\vec{b}$ of point $\vec{y}$ onto $\vec{\theta}$ is:
+			\begin{equation}
+				\vec{b} = \vec{y}\cdot \frac{\vec{\theta}}{|\vec{\theta}|}
+			\end{equation}
+			Hence, we may obtain the distance, $d$, of $\vec{y}$ from P by computing the $\ell^2$-norm of the projection of $\vec{b}-\vec{a}$ on $\vec{\theta}$.
+			\begin{equation}
+				\vec{b} - \vec{a} = (\vec{y}-\vec{x})\cdot\frac{\vec{\theta}}{|\theta|}
+			\end{equation}
+			Substituting hyperplane equation $\vec{\theta}\cdot x = -\theta_0$, we can express the distance $d$ in terms of point $\vec{y}$ and hyperplane parameters $\vec{\theta}$ and $\theta_0$:
+			\begin{equation}
+				d = \lVert(\vec{b}-\vec{a})\rVert_2 = \biggl \lVert \frac{\vec{y}\cdot\vec{\theta} + \theta_0}{\theta} \biggr \rVert_2
+			\end{equation}
+
+	\subsection*{b. Sum of Poisson random variables}
+		\subsubsection*{Independence}
+			Let $Z = X + Y$ where $X = Pois(\alpha)$ and $Y = Pois(\beta)$. Since $X$ and $Y$ are independent, $Y = Z - X$ and:
+			\begin{equation}
+				P_Z(z) = \sum_{x}P_X(x)P_Y(z-x)
+			\end{equation}
+		\subsubsection*{Proof that Z is Poisson}
+			\begin{equation}
+				P_Z(z) = \sum^{z}_{x=0} \frac{\alpha^{x}\mathrm{e}^{-\alpha}}{x!} \frac{\beta^{(z-x)}\mathrm{e}^{-\beta}}{(z-x)!}
+			\end{equation}
+			We can use the fractional form of the binomial coefficient $\binom{n}{k}$ to simplify (9):
+			\begin{equation}
+				\binom{z}{x} = \frac{z!}{(z-x)!\,x!}
+			\end{equation}
+			\begin{equation}
+				P_Z(z) = \frac{\mathrm{e}^{-(\alpha+\beta)}}{z!}\sum^{z}_{x=0}\binom{z}{x}\alpha^{x}\beta^{(z-x)}
+			\end{equation}
+			Which conveniently reduces to:
+			\begin{equation}
+				P_Z(z) = \frac{\mathrm{e}^{-(\alpha+\beta)}}{z!}(\alpha + \beta)^{z}
+			\end{equation}
+			Therefore, $Z$ is also Poisson with rate $\gamma = (\alpha + \beta)$.
+			
+\section{Python and Theano}
+	\subsection*{a. Python and Theano Versions}
+	Python 3.6.6 (Anaconda), Theano 1.0.2
+
+\end{document}
