@@ -1,0 +1,372 @@
+\documentclass[9pt,twocolumn]{article}
+\usepackage[margin=0.8in,bottom=1.25in,columnsep=.4in]{geometry}
+%\usepackage{indentfirst}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\START}{\text{\lstinline{START}}}
+\newcommand{\STOP}{\text{\lstinline{STOP}}}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\lstset{frame=tb,
+  language=Bash,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\title{
+    01.112 Machine Learning\\
+    Homework 4
+}
+
+\author{Joel Huang, 1002530}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Hidden Markov Models}
+    \subsection*{Model Parameters}
+        \subsubsection*{Parameters associated with the HMM}
+            The HMM is parameterized by:
+            \begin{enumerate}
+            \item
+                $\mathcal{T}$, the set of states, including the $\START$ and $\STOP$ states. $\mathcal{T} = 0$ (\START)$, \ldots, |\mathcal{T}|-2\,$(\STOP).
+            \item
+                $\mathcal{O}$, the set of observation symbols.
+            \item
+                $a_{u,v}$, the transition parameters, which are the probabilities of transitioning from state $u$ to $v$.
+                \begin{equation}
+                    a_{u,v} = p(y_{next} = v\,|\,y_{curr} = u)  
+                \end{equation}
+                where $u \in [0, \ldots, |\mathcal{T}|-2]$, $v \in [1, \ldots, |\mathcal{T}|-1]$.
+            \item
+                $b_{u}(o)$, the emission parameters, which are the probabilities of emitting symbol $o$ given state $u$.
+                \begin{equation}
+                    b_u(o) = p(x=o\,|\,y=u)
+                 \end{equation}
+            \end{enumerate}
+        \subsubsection*{Computing optimal model parameters}
+            \begin{itemize}
+                \item
+                    States $\mathcal{T} = \{$\START$,\,X,\,Y,\,Z,$ \STOP$\}$
+                \item
+                    Observations $\mathcal{O} = \{a,\,b,\,c\}$
+                \item
+                    Transition parameters:
+                    \begin{equation}
+                        a_{\START,X} = \dfrac{Count(\START;X)}{Count(\START)} = \dfrac{2}{4} = 0.5
+                    \end{equation}
+
+                    \begin{equation}
+                        a_{\START,Z} = \dfrac{Count(\START;Z)}{Count(\START)} = \dfrac{2}{4} = 0.5
+                    \end{equation}
+
+                    \begin{equation}
+                        a_{X,Y} = \dfrac{Count(X;Y)}{Count(X)} = \dfrac{2}{5} = 0.4
+                    \end{equation}
+
+                    \begin{equation}
+                        a_{X,Z} = \dfrac{Count(X;Z)}{Count(X)} = \dfrac{2}{5} = 0.4
+                    \end{equation}
+
+                    \begin{equation}
+                        a_{Y,X} = \dfrac{Count(Y;X)}{Count(Y)} = \dfrac{1}{5} = 0.2
+                    \end{equation}
+
+                    \begin{equation}
+                        a_{Y,Z} = \dfrac{Count(Y;Z)}{Count(Y)} = \dfrac{1}{5} = 0.2
+                    \end{equation}
+
+                    \begin{equation}
+                        a_{Z,X} = \dfrac{Count(Z;X)}{Count(Z)} = \dfrac{2}{5} = 0.4
+                    \end{equation}
+
+                    \begin{equation}
+                        a_{Z,Y} = \dfrac{Count(Z;Y)}{Count(Z)} = \dfrac{3}{5} = 0.6
+                    \end{equation}
+
+                    \begin{equation}
+                        a_{X, \STOP} = \dfrac{Count(X;\STOP)}{Count(X)} = \dfrac{1}{5} = 0.2
+                    \end{equation}
+
+                    \begin{equation}
+                        a_{Y, \STOP} = \dfrac{Count(Y;\STOP)}{Count(Y)} = \dfrac{3}{5} = 0.6
+                    \end{equation}
+                \item
+                    Emission parameters:
+                    \begin{equation}
+                        b_X(a) = \dfrac{Count(X \rightarrow a)}{Count(X)} = \dfrac{2}{5} = 0.4
+                    \end{equation}
+
+                    \begin{equation}
+                        b_Y(a) = \dfrac{Count(Y \rightarrow a)}{Count(Y)} = \dfrac{2}{5} = 0.4
+                    \end{equation}
+
+                    \begin{equation}
+                        b_Z(a) = \dfrac{Count(Z \rightarrow a)}{Count(Z)} = \dfrac{1}{5} = 0.2
+                    \end{equation}
+
+                    \begin{equation}
+                        b_X(b) = \dfrac{Count(X \rightarrow b)}{Count(X)} = \dfrac{3}{5} = 0.6
+                    \end{equation}
+
+                    \begin{equation}
+                        b_Z(b) = \dfrac{Count(Z \rightarrow b)}{Count(Z)} = \dfrac{3}{5} = 0.6
+                    \end{equation}
+
+                    \begin{equation}
+                        b_Y(c) = \dfrac{Count(Y \rightarrow c)}{Count(Y)} = \dfrac{3}{5} = 0.6
+                    \end{equation}
+
+                    \begin{equation}
+                        b_Z(c) = \dfrac{Count(Z \rightarrow c)}{Count(Z)} = \dfrac{1}{5} = 0.2
+                    \end{equation}
+                   
+            \end{itemize}
+
+    \subsection*{Viterbi Algorithm}
+        \subsubsection*{Formulation}
+            \begin{enumerate}
+            \item
+                Our objective is to ouput the sequence of tags $y_1, \ldots, y_n$ with the highest likelihood:
+                \begin{equation}
+                    \max_{y_1, \ldots, y_n} P(y_1, \ldots, y_n)
+                \end{equation}
+
+                Let $y_1, \ldots, y_k$ be a subset of $y_1, \ldots, y_n$, where $v=y_k$. Define $\pi(k,v)$ as the sequence of tags up to $y_k$ that has the highest likelihood:
+                \begin{equation}
+                \begin{split}
+                    \pi(k,v) = & \max_{y_1, \ldots, y_k}\, P(y_1, \ldots, y_k) \\
+                               & \max_{y_1, \ldots, y_k}\, \left\{{{\, \prod^k_{i=1} a_{y_{i-1}, y_i} \cdot \prod^k_{i=1}b_{y_i}(x_i)\,}}\right\}
+                \end{split}
+                \end{equation}
+
+                \begin{center}
+                    \begin{tabular}{lcccc} 
+                        \toprule
+                        \multicolumn{5}{l}{\bfseries Table of $\pi(k,v)$ for next state $v$}\\
+                        \midrule
+                        iteration $k$ & 0 & 1 & \ldots & $n$ \\
+                        % tag slot $y_k$ & $y_1$ & $y_2$ & \ldots & $y_n$ \\
+                        \cmidrule(lr){1-5}
+                        $v=\START$ & 1 & 0 & \ldots & 0\\
+                        $v=y_1$ & 0 & $\pi(1,y_1)$ & \ldots & $\pi(n,y_1)$ \\
+                        $v=y_2$ & 0 & $\pi(1,y_2)$ & \ldots & $\pi(n,y_2)$\\
+                        $\dots$ & $\vdots$ & $\vdots$ & $\ddots$ & $\vdots$\\
+                        $v=y_n$ & 0 & $\pi(1,y_n)$ & \ldots & $\pi(n,y_n)$\\
+                        % $v=\STOP$ & 0 & 0 & \ldots & 0\\
+                        \bottomrule
+                    \end{tabular}
+                \end{center}
+
+                For example, for iteration $k=4$, and next state $v=y_2$, we find the maximum probability of the over all possible states.
+                \begin{equation}
+                    \pi(4,y_2) = \max_{u \in y_0, \ldots, y_{n+1}}\, \left\{ \pi(3,u)\cdot a_{u,y_2} \cdot b_{y_2}(x_4) \right\},
+                \end{equation}
+
+                \begin{itemize}
+                    \item $\pi(3,u)$, where $u$ is the state which survives after taking the maximum probability over all possible states when $k=3$,
+                    \item $a_{u,y_2}$, the probability of transitioning from state $u$ to state $y_2$,
+                    \item $b_{y_2}(x_4)$, the probability of emitting observation $x_4$ given state $y_2$.
+                \end{itemize}
+                
+            \item
+                Base case, $k = 0$.
+                \begin{equation}
+                \pi(k=0,v) = 
+                \begin{cases}
+                  1, & \text{if}\ v=\START \\
+                  0, & \text{otherwise}
+                \end{cases}
+                \end{equation}
+                
+            \item
+                Recursive, for $k = 1, \ldots, n$, the best probability of the best previous path $\times$ transition $\times$ emission.
+                \begin{equation}
+                    \pi(k,v) = \max_u\,\{\,{\pi(k-1, u) \cdot a_{u,v} \cdot b_v(x_k)}\,\}
+                \end{equation}
+
+            \item
+                Termination case.
+                \begin{equation}
+                    \pi(k=(n+1),\,\STOP) = \max_v\,\{\,\pi(n,v) \cdot a_{v, \STOP}\,\}
+                \end{equation}
+            \end{enumerate}
+
+        \subsubsection*{Computation}
+
+            \begin{enumerate}
+                \item Input: $x = \{b,\,b\}$
+                \item
+                    $k=0$, base case:
+                    \begin{equation}
+                        \pi(0, \START) = 1    
+                    \end{equation}
+                \item
+                    $k=1$:
+                    \begin{equation}
+                    \begin{split}
+                        \pi(1, X) & = \pi(0, \START) \cdot a_{\START,X} \cdot b_X(b)\\
+                        & = 1 \times 0.5 \times 0.6 = 0.3 \\
+                        \pi(1, Y) & = \pi(0, \START) \cdot a_{\START,Y} \cdot b_Y(b)\\
+                        & = 1 \times 0 \times 0 = 0 \\
+                        \pi(1, Z) & = \pi(0, \START) \cdot a_{\START,Z} \cdot b_Z(b)\\
+                        & = 1 \times 0.5 \times 0.6 = 0.3
+                    \end{split}
+                    \end{equation}
+                \item
+                    $k=2$:
+                    \begin{equation}
+                    \begin{split}
+                        \pi(2, X) = & \max_{X,Y,Z}\,\{\, \pi(1, X) \cdot a_{X,X} \cdot b_X(b),\\
+                        & \pi(1, Y) \cdot a_{X,Y} \cdot b_Y(b),\\
+                        & \pi(1, Z) \cdot a_{X,Z} \cdot b_Z(b) \,\}\\
+                        = & \max\,\{0,\,0,\,0.072\} = 0.072\\
+                        \pi(2, Y) = & \max\,\{0,\,0,\,0\} = 0\\
+                        \pi(2, Z) = & \max\,\{0.072,\,0,\,0\} = 0.072\\
+                    \end{split}
+                    \end{equation}
+
+                \item
+                    $k=3$, termination case:
+                    \begin{equation}
+                    \begin{split}
+                        \pi(3,\,\STOP) & = \max_v \,\{\,\pi(2,v) \cdot a_{v, \STOP}\,\}\\
+                        = & \max\,\{\pi(2,X) \cdot a_{X, \STOP}\\
+                        & \pi(2,Y) \cdot a_{Y, \STOP},\\
+                        &\pi(2,Z) \cdot a_{Z, \STOP}\}\\
+                        = & \max\,\{0.072\times0.2,\,0,\,0\}
+                        = 0.0144
+                    \end{split}
+                    \end{equation}
+
+                \item
+                    We then backtrack, finding the best values for each state:
+                    \begin{equation}
+                    \begin{split}
+                        y_2: & \argmax_v\,\{\, 0.0144,\,0,\,0 \,\} = X \\
+                        y_1: & \argmax_v\,\{\, 0,\,0,\,0.072 \,\} = Z \\
+                    \end{split}
+                    \end{equation}
+                    So the most probable sequence is:
+                    \begin{equation}
+                        y_0,\ldots, y_{n+1}=\START,Z,X,\STOP
+                    \end{equation}
+            \end{enumerate}
+
+        \subsection*{Top-$k$ decoding}
+            Currently, at each $\pi(i,u)$ we only store one parent. However suppose we stored the top $k$ predecessors. So each $\pi(i,u)$ corresponds not only to a most likely value and the node which it transitioned from, but a list of the top $k$ nodes it could have transitioned from and their values in sorted order. Therefore, in order to perform top-$k$ decoding, we must store the top $k$ optimal sub-paths at each node, instead of just the top sub-path with the highest probability. 
+
+            \subsubsection*{Formulation}
+            \begin{enumerate}
+
+
+
+                \item
+                Base case, $i = 0$. This is unchanged from the vanilla Viterbi algorithm.
+                \begin{equation}
+                \pi(i=0,v) = 
+                \begin{cases}
+                  1, & \text{if}\ v=\START \\
+                  0, & \text{otherwise}
+                \end{cases}
+                \end{equation}
+                
+            \item
+                Recursive, for $i = 1, \ldots, n$, the $k$ best probabilities of the previous paths $\times$ transition $\times$ emission. Here, in contrast to the vanilla Viterbi algorithm which carries out a max operation to sieve out the best preceding node, we take the top $k$ preceding nodes and store them.\\ \\
+                We define a k-max operator, which selects the $k$ highest elements in the set, then sorts them in descending order.
+                \begin{equation}
+                    \pi(i,v) = {\text{k-max}}_u\,\{\,{\pi(i-1, u) \cdot a_{u,v} \cdot b_v(x_i)}\,\}
+                \end{equation}
+
+            \item
+                Termination case.
+                \begin{equation}
+                    \pi(i=(n+1),\,\STOP) = {\text{k-max}}_v\,\{\,\pi(n,v) \cdot a_{v, \STOP}\,\}
+                \end{equation}
+
+            \item
+                Backtracking. We can visualize the backtracking using a matrix $A$, of size $k\times n$.\\
+                \begin{center}
+                \begin{tabular}{lcccc} 
+                    \toprule
+                     & 1 & \ldots & $n$ \\
+                    1 & & & \\
+                    \vdots & & & \\
+                    $k$ & & & \\
+                    \bottomrule
+                \end{tabular}
+                \end{center}
+                At the termination point, we have $\pi(n,v)\cdot a_{v,\STOP}$ for all $v \in \mathcal{T}$. Since $\pi(n+1, \STOP)$ is now a list of the $k$ highest probabilities of paths, we check which paths from the $n$-th layer led to it. For each $v$, if $\pi(n,v)\cdot a_{v,\STOP} \in \pi(n+1, \STOP)$, then fill the $n$-th column of $A$ with the states $v$ that contributed to these highest probabilities.\\ \\
+                Similarly, for the $i$-th layer, compute $\pi(i-1,u)\cdot a_{u,v} \cdot b_v(x_i)$ and check which path from the $(i-1)$-th layer led to it, and fill the $i$-th column of $A$ with the states $u$ that contributed to the highest probabilities. Repeat this till the first $(i=1)$ layer, where we instead compute $\pi(1,u) \cdot a_{\START,v} \cdot b_v(x_i)$. Reading the rows of $A$ then gives us each top-$k$ most probable sequences.
+            \end{enumerate}
+
+        \subsection*{Forward-backward algorithm}
+            Define two observation spaces $\{X_1, \ldots, X_n\}$, and $\{Y_1, \ldots, Y_n\}$. Define a state space $\{Z_0, \ldots, Z_{n+1}\}$ where $Z_0 = \START$, $Z_{n+1} = \STOP$. Parameterize the model by $a_{u,v}$, $b_u(o)$, and $c_o(e)$, where $c_o(e)$ is the additional emission probability introduced. Unfolding the joint probability using newly defined $\alpha$ and $\beta$:
+
+            \begin{equation}
+            \begin{split}
+                P(x_1, \ldots, x_n, y_1, \ldots, y_n, z_i = u)\\
+                = P(x_1, \ldots, x_{i-1}, y_1, \ldots, y_{i-1}, z_i = u)\cdot \\
+                P(x_1, \ldots, x_n, y_1, \ldots, y_n | z_i = u)    \\
+                = P(x_1, \ldots, x_{i-1}, z_i = u) \cdot \sum_{j=1}^{i} P(y_j|x_j) \cdot\\
+                P(x_1, \ldots, x_{i-1} | z_i = u) \cdot \sum_{k=i}^{n} P(y_k|x_k)\\
+                = \alpha_u(i) \cdot \beta_u(i)
+            \end{split}
+            \end{equation}
+
+            \subsubsection*{Forward algorithm}
+            \begin{enumerate}
+                \item
+                Base case:
+                \begin{equation}
+                    \alpha_u (1) = a_{\START,u}
+                \end{equation}
+                \item
+                Recursive case:
+                \begin{equation}
+                    \alpha_u (i) = \sum_{v} \alpha_v(i-1) \cdot a_{v,u} \cdot b_u(x_i) \cdot c_{x_i}(y_i)
+                \end{equation}
+            \end{enumerate}
+
+            \subsubsection*{Backward algorithm}
+            \begin{enumerate}
+                \item
+                Base case:
+                \begin{equation}
+                    \beta_u (n) = a_{u, \STOP} \cdot b_u(x_n) \cdot c_{x_n} (y_n)
+                \end{equation}
+                \item
+                Recursive case:
+                \begin{equation}
+                    \beta_u (i) = \sum_{v} \beta_v(i+1) \cdot a_{v,u} \cdot b_u(x_i) \cdot c_{x_i}(y_i)
+                \end{equation}
+            \end{enumerate}
+
+            For this algorithm, time complexity will be $O(n|T|^2)$ for both forward and backward algorithms. We need to visit each node in the layer once, giving $|T|^2$ total operations. We also traverse from $\START$ to $\STOP$, over $n$ total layers. Hence the total number of operations is $n\cdot|T|^2$.
+
+\end{document}
